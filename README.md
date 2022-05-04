@@ -2,7 +2,7 @@
 
 Unity Version 2020.2.6f1
 
-*Control*
+*CONTROL*
 
 moving - WASD
 
@@ -11,6 +11,6 @@ cameraControl - Mouse
 Interaction - E
 
 
-NOT REPERED BUGS
+*NOT REPERED BUGS*
 
 - Camera 360 rotation
