@@ -1,88 +1,68 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private InputActionReference movmentControl;
-    [SerializeField]
-    private InputActionReference Interaction;
-    [SerializeField]
-    public float playerSpeed;
-    [SerializeField]
-    private float rotationSpeed = 200f;
-    [SerializeField]
-    private float gravityValue = 9.8f;
+    public GameObject Player;
+    private Animator _animator;
+    private CharacterController _characterController;
+    private Rigidbody _Rigidbody;
+    [SerializeField] private float speed;
+    [SerializeField] private float mouseSensitivityX;
+    [SerializeField] private float mouseSensitivityY;
+    [SerializeField] private float gravity = -9.81f;
+    Vector3 lastPos;
+    Vector3 velocity;
 
-
-    private CharacterController controller;
-    [SerializeField]
-    private Vector3 playerVelocity;
-
-    private Transform cameraMainTransform;
-    private Transform Player;
-    private Animator anim;
-
-    [SerializeField]
-    public static bool isEpressed;
-
-    private void OnDisable()
+    private void Awake()
     {
-        Interaction.action.Disable();
-        movmentControl.action.Disable();
-    }
-    private void OnEnable()
-    {
-        Interaction.action.Enable();
-        movmentControl.action.Enable();
-    }
-    private void Start()
-    {
-        controller = GetComponent<CharacterController>();
-        anim = GetComponent<Animator>();
-        cameraMainTransform = Camera.main.transform;
-        Player = this.GetComponent<Transform>();
+        _animator = Player.GetComponent<Animator>() ?? throw new NullReferenceException();
+        _characterController = GetComponent<CharacterController>() ?? throw new NullReferenceException();
     }
 
-    void Update()
+    private void Update()
     {
-        //MOVMENT
-        if (Interaction.action.triggered)
+        MovePlayerVertically();
+        MovePlayerHorizontally();
+
+        var xMouseInput = Input.GetAxis("Mouse X");
+        RotatePlayer(xMouseInput);
+        var yMouseInput = Input.GetAxis("Mouse Y");
+        RotateCamera(yMouseInput);
+        if (Player.transform.position != lastPos)
         {
-            isEpressed = true;
+            _animator.SetBool("isMoving", true);
+            _animator.SetFloat("Speed", 1f, 0.1f, 1f);
         }
         else
         {
-            isEpressed = false;
+            _animator.SetBool("isMoving", false);
+            _animator.SetFloat("Speed", 0f, 0.1f, 0f);
         }
-        playerVelocity.y -= gravityValue * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
-        Vector2 movment = movmentControl.action.ReadValue<Vector2>();
-        Vector3 move = new Vector3(movment.x, 0, movment.y);
+        lastPos = Player.transform.position;
 
-        move = cameraMainTransform.forward * move.z + cameraMainTransform.right * move.x;
-        move.y = 0f;
+        velocity.y += gravity * Time.deltaTime;
+        _characterController.Move(velocity *Time.deltaTime);
+    }
+    private void MovePlayerHorizontally()
+    {
+        var moveDirection = transform.right * Input.GetAxis("Horizontal") * speed * Time.deltaTime;
+        _characterController.Move(moveDirection);
+    }
 
-        controller.Move(move * Time.deltaTime * playerSpeed);
-        //PLAYER ROTATION
-        if (movment != Vector2.zero)
-        {
-            float targetAngle = Mathf.Atan2(movment.x, movment.y) * Mathf.Rad2Deg + cameraMainTransform.eulerAngles.y;
-            Quaternion rotation = Quaternion.Euler(0f, targetAngle, 0f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
-            controller.Move(move * Time.deltaTime * playerSpeed);
-            anim.SetBool("isMoving", true);
-            anim.SetFloat("Speed", 1f, 0.1f, Time.deltaTime);
-        }
-        else
-        {
-            anim.SetFloat("Speed", 0f, 0.1f, Time.deltaTime);
-            anim.SetBool("isMoving", false);
-        }
+    private void RotatePlayer(float xMouseInput)
+    {
+        transform.Rotate(0, xMouseInput * mouseSensitivityX * Time.deltaTime, 0);
+    }
+    private void RotateCamera(float yMouseInput)
+    {
+        Camera.main.transform.Rotate(-yMouseInput * mouseSensitivityY * Time.deltaTime, 0, 0);
+    }
+    private void MovePlayerVertically()
+    {
+        var moveDirection = transform.forward * Input.GetAxis("Vertical") * speed * Time.deltaTime;
+        _characterController.Move(moveDirection);
     }
 }

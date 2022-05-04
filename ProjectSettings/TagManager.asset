@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Door
   - Button
+  - CallButton
+  - OpenDoorButton
+  - SafeCheck
   layers:
   - Default
   - TransparentFX

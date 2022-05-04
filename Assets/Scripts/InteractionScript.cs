@@ -4,61 +4,63 @@ using UnityEngine;
 
 public class InteractionScript : MonoBehaviour
 {
-    public GameObject Button;
-    private Animator anim;
-    public bool canInteract;
-    public bool Open;
-    public bool test;
-    public GameObject ButtonGroundFloor;
-    public GameObject ButtonFirstFloor;
-    public GameObject ButtonSecondFloor;
-    public GameObject ButtonThirdFloor;
+    public static GameObject Button;
+    public static GameObject CallButton;
+    public GameObject door;
+    public GameObject OpenDoorButton;
+
     public GameObject Lift;
-    public int Floor;
+
+    public static Animator _anim;
+
+    public static bool canInteract;
+    public static bool OpenTheDoor;
+
+    public static bool Open;
+
+    public AudioClip OpenDoorSound;
+    public AudioClip CloseDoorSound;
+    public AudioClip LiftSound;
+
+    public AudioSource LiftAudio;
+    public AudioSource LiftSoud;
+
     void Start()
     {
         Open = false;
-        GameObject door = GameObject.FindWithTag("Door");
-        anim = door.GetComponent<Animator>();
+        LiftAudio = Lift.GetComponent<AudioSource>();
+        LiftSoud = Camera.main.GetComponent<AudioSource>();
+        _anim = door.GetComponent<Animator>();
     }
     // Update is called once per frame
     void Update()
     {
-        if (PlayerController.isEpressed)
+
+        if (Input.GetKey(KeyCode.E) && OpenTheDoor == true && Open == true && !LiftController.isMoving)
         {
-            test = true;
+            _anim.SetBool("isOpen", true);
+            LiftAudio.PlayOneShot(OpenDoorSound, 0.2f);
+            Open = false;
+        }
+        else if (Input.GetKey(KeyCode.E) && OpenTheDoor == true && Open == false && !LiftController.isMoving)
+        {
+            _anim.SetBool("isOpen", false);
+            LiftAudio.PlayOneShot(CloseDoorSound, 0.2f);
+            Open = true;
+        }
+        if (LiftController.isMoving)
+        {
+            LiftSoud.Play();
+            _anim.SetBool("isOpen", false);
+            LiftAudio.PlayOneShot(CloseDoorSound, 0.2f);
+            Open = true;
         }
         else
         {
-            test = false;
-        }
-        if (PlayerController.isEpressed && canInteract == true && Open == true)
-        {
-            anim.SetBool("isOpen", true);
+            LiftSoud.Stop();
+            _anim.SetBool("isOpen", true);
+            LiftAudio.PlayOneShot(OpenDoorSound, 0.2f);
             Open = false;
-        }
-        else if (PlayerController.isEpressed && canInteract == true && Open == false)
-        {
-            anim.SetBool("isOpen", false);
-            Open = true;
-        }
-        if (Button == ButtonGroundFloor && canInteract == true && PlayerController.isEpressed)
-        {
-            Floor = 0;
-            Lift.transform.position += Lift.transform.up * Time.deltaTime* 20f;
-        }
-        if (Button == ButtonFirstFloor && canInteract == true && PlayerController.isEpressed)
-        {
-            Floor = 1;
-            Lift.transform.position += Lift.transform.up * Time.deltaTime * 20f;
-        }
-        if (Button == ButtonSecondFloor && canInteract == true && PlayerController.isEpressed)
-        {
-            Floor = 2;
-        }
-        if (Button == ButtonThirdFloor && canInteract == true && PlayerController.isEpressed)
-        {
-            Floor = 3;
         }
     }
     private void OnTriggerEnter(Collider col)
@@ -68,6 +70,15 @@ public class InteractionScript : MonoBehaviour
             Button = col.gameObject;
             canInteract = true;
         }
+        if (col.tag == "CallButton")
+        {
+            CallButton = col.gameObject;
+            OpenTheDoor = true;
+        }
+        if(col.tag == "OpenDoorButton")
+        {
+            OpenTheDoor = true;
+        }
     }
     private void OnTriggerExit(Collider col)
     {
@@ -75,6 +86,15 @@ public class InteractionScript : MonoBehaviour
         {
             Button = null;
             canInteract = false;
+        }
+        if (col.tag == "CallButton")
+        {
+            CallButton = null;
+            OpenTheDoor = false;
+        }
+        if (col.tag == "OpenDoorButton")
+        {
+            OpenTheDoor = false;
         }
     }
 }
