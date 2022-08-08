@@ -1,16 +1,20 @@
-# Lift-Project
+<div dir="auto">
+<h1>Lift-Project</h1>
+<div>
+  
+<img src="https://i.postimg.cc/Pqtf73c0/Lift.png" ></img> 
+ 
+Lift-Project is a simple elevator project made for recruitment purposes.
 
-Unity Version 2020.2.6f1
+The project includes:
+- player model with basic movement and animations
+- calling lift from all floors
+- elevator moving across the floors
+- a photo cell to check whether the door will not crush the player
 
-*CONTROL*
-
-moving - WASD
-
-cameraControl - Mouse
-
-Interaction - E
-
-
-*NOT REPERED BUGS*
-
-- Camera 360 rotation
+  <h2>Gallery</h2>
+  <div dir="auto">
+  <img src="https://i.postimg.cc/BnkftvNC/Lift-Out-Side.png" width="15%" height="10%"></img> 
+  <img src="https://i.postimg.cc/J4RRHDxM/Fight.png" width="15%" height="10%"></img>  
+  <img src="https://i.postimg.cc/52vnqNbg/Flors.png" width="15%" height="10%"></img>  
+  </div>
